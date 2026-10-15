@@ -2,3 +2,6 @@
 .venv
 pyproject.toml
 uv.lock
+tests/
+plib/
+.coverage
