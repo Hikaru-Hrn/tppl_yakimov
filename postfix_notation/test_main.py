@@ -1,5 +1,6 @@
 import sys
 import pytest
+import os
 from main import calculate, main
 
 
@@ -38,15 +39,28 @@ def test_errors():
 def test_main(monkeypatch, capsys):
     # Запуск без аргументов
     monkeypatch.setattr(sys, "argv", ["main.py"])
-    main()
-    assert "Вы забыли передать выражение." in capsys.readouterr().out
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code != 0
+    captured = capsys.readouterr()
+    assert "Вы забыли передать выражение." in (captured.out + captured.err)
 
-    # Нормальный запуск
+    # Нормальный запуск в кавычках
     monkeypatch.setattr(sys, "argv", ["main.py", "2 3 +"])
     main()
     assert "2 3 + = 5" in capsys.readouterr().out
 
+    # Имитация запуска `python3 main.py 2 3 ~` без кавычек в терминале
+    # Оболочка заменяет ~ на путь к домашней директории до запуска скрипта
+    home_dir = os.path.expanduser("~")
+    monkeypatch.setattr(sys, "argv", ["main.py", "2", "3", home_dir])
+    main()
+    assert "2 3 ~ = 1" in capsys.readouterr().out
+
     # Запуск с ошибкой (деление на 0)
     monkeypatch.setattr(sys, "argv", ["main.py", "2 0 /"])
-    main()
-    assert "Ой, ошибка:" in capsys.readouterr().out
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code != 0
+    captured = capsys.readouterr()
+    assert "Ой, ошибка:" in (captured.out + captured.err)
