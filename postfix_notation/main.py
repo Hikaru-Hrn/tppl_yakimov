@@ -1,4 +1,5 @@
 import sys
+import os
 
 
 def calculate(expression):
@@ -56,19 +57,24 @@ def calculate(expression):
 
 def main():
     if len(sys.argv) < 2:
-        print("Вы забыли передать выражение.")
-        print('Пример: python main.py "3 0 4 ~ 2 ~"')
-        return
+        print("Вы забыли передать выражение.", file=sys.stderr)
+        print('Пример: python main.py "3 0 4 ~ 2 ~"', file=sys.stderr)
+        sys.exit(1)  # Завершаем программу с кодом ошибки 1
+
+    # Защита от раскрытия тильды при запуске без кавычек
+    home_dir = os.path.expanduser("~")
+    raw_args = ["~" if arg == home_dir else arg for arg in sys.argv[1:]]
 
     # Собираем аргументы в одну строку и убираем лишние пробелы
-    expr = " ".join(sys.argv[1:])
+    expr = " ".join(raw_args)
     clean_expr = " ".join(expr.split())
 
     try:
         result = calculate(clean_expr)
         print(f"{clean_expr} = {result}")
     except Exception as e:
-        print(f"Ой, ошибка: {e}")
+        print(f"Ой, ошибка: {e}", file=sys.stderr)
+        sys.exit(1)  # 1 при любой ошибке вычисления
 
 
 if __name__ == "__main__":
