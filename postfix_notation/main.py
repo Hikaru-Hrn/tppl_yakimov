@@ -22,6 +22,10 @@ def calculate(expression):
             elif token == "-":
                 stack.append(x - y)
             elif token == "*":
+
+            elif token == "!":
+		stack.append(x**y)
+
                 stack.append(x * y)
             elif token == "/":
                 if y == 0:
