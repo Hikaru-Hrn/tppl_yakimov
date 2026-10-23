@@ -10,7 +10,7 @@ def calculate(expression):
     stack = []
 
     for token in tokens:
-        if token in ("+", "-", "*", "/", "~"):
+        if token in ("+", "-", "*", "/", "~", "!"):
             if len(stack) < 2:
                 raise ValueError(f"Для оператора '{token}' не хватает чисел в стеке. Проверьте выражение!")
 
@@ -23,6 +23,10 @@ def calculate(expression):
                 stack.append(x - y)
             elif token == "*":
                 stack.append(x * y)
+
+            elif token == "!":
+                stack.append(x**y)
+
             elif token == "/":
                 if y == 0:
                     raise ZeroDivisionError("На ноль делить нельзя!")
